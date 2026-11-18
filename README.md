@@ -17,21 +17,21 @@ source-language SRT and VTT, and translates the cue text through
 [LLM Gateway](https://www.assemblyai.com/products/llm-gateway) in batches of 40. Each translation is written
 back into its original timestamp, so cue timing is exact. Change `LLM_MODEL` to any LLM Gateway model.
 
-## Alternative: Universal-2 with built-in Translation
+## Alternative: AssemblyAI-STT-3.7 with built-in Translation
 
-`translate_subtitles_universal2.py` sends one request that transcribes and translates each speaker turn
+`translate_subtitles_builtin.py` sends one request that transcribes and translates each speaker turn
 (`speech_understanding` Translation with `match_original_utterance`), then splits each translated turn into
 cues by character share. Timing is exact at each speaker turn and approximate inside a long one.
 
-Async AssemblyAI-STT-3.7 doesn't support built-in Translation yet, so this script sets `speech_models` to
-`universal-2`, the GA model on the
+This script sets `speech_models` to `assemblyai-stt-3-7`, which is on the
 [Translation supported-models list](https://www.assemblyai.com/docs/speech-understanding/translation).
-Check that list and change `SPEECH_MODELS` when it adds newer models.
+For audio outside its 32 languages, set `SPEECH_MODELS` to `["assemblyai-stt-3-7", "universal-2"]`.
+Cost per audio hour: AssemblyAI-STT-3.7 $0.21, speaker labels $0.02, Translation $0.06.
 
 | Script | How it translates | Cue timing |
 |---|---|---|
 | `translate_subtitles.py` (default) | AssemblyAI-STT-3.7 transcript, source SRT, cue text translated through LLM Gateway | Exact: copied from the source SRT |
-| `translate_subtitles_universal2.py` | Universal-2 + built-in Translation, per-utterance translations | Approximate inside a speaker turn |
+| `translate_subtitles_builtin.py` | AssemblyAI-STT-3.7 + built-in Translation, per-utterance translations | Approximate inside a speaker turn |
 
 ## Setup
 
@@ -49,8 +49,8 @@ export ASSEMBLYAI_API_KEY=your-api-key   # https://www.assemblyai.com/dashboard/
 # Default: AssemblyAI-STT-3.7 + LLM Gateway, local file or public URL
 python translate_subtitles.py video.mp4 --languages es fr
 
-# Alternative: Universal-2 + built-in Translation
-python translate_subtitles_universal2.py video.mp4 --languages es fr
+# Alternative: AssemblyAI-STT-3.7 + built-in Translation
+python translate_subtitles_builtin.py video.mp4 --languages es fr
 ```
 
 Use a file in a browser player:

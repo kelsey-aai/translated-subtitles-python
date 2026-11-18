@@ -1,13 +1,12 @@
-"""Alternative build: Universal-2 with AssemblyAI's built-in Translation.
+"""Alternative build: AssemblyAI-STT-3.7 with AssemblyAI's built-in Translation.
 
 One request transcribes the video and translates each speaker turn
 (`match_original_utterance`). Each translated turn is split into cues, so
-timing inside a long turn is approximate. Async AssemblyAI-STT-3.7 doesn't
-support built-in Translation yet; for exact cue timing on AssemblyAI-STT-3.7,
-use translate_subtitles.py (the default build).
+timing inside a long turn is approximate. For exact cue timing, use
+translate_subtitles.py (the default build).
 
 Usage:
-    python translate_subtitles_universal2.py video.mp4 --languages es fr
+    python translate_subtitles_builtin.py video.mp4 --languages es fr
 """
 import argparse
 import os
@@ -19,9 +18,10 @@ import requests
 from subtitles import split_utterance, to_srt, to_vtt
 
 BASE_URL = "https://api.assemblyai.com"
-# Translation's supported-models list names Universal-2; check
-# https://www.assemblyai.com/docs/speech-understanding/translation for updates.
-SPEECH_MODELS = ["universal-2"]
+# AssemblyAI-STT-3.7 is on Translation's supported-models list:
+# https://www.assemblyai.com/docs/speech-understanding/translation
+# For audio outside its 32 languages, use ["assemblyai-stt-3-7", "universal-2"].
+SPEECH_MODELS = ["assemblyai-stt-3-7"]
 
 
 def headers():

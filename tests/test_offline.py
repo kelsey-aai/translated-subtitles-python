@@ -15,7 +15,7 @@ os.environ.setdefault("ASSEMBLYAI_API_KEY", "test-key")
 
 import subtitles  # noqa: E402
 import translate_subtitles  # noqa: E402
-import translate_subtitles_universal2  # noqa: E402
+import translate_subtitles_builtin  # noqa: E402
 
 # Shape copied from the response example in the AssemblyAI translation docs.
 TRANSCRIPT = {
@@ -93,7 +93,7 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(subtitles.parse_srt(subtitles.to_srt(cues)), cues)
 
 
-class Universal2AlternativeTests(unittest.TestCase):
+class BuiltinTranslationAlternativeTests(unittest.TestCase):
     def test_request_and_files(self):
         posted = {}
 
@@ -109,18 +109,18 @@ class Universal2AlternativeTests(unittest.TestCase):
             return FakeResponse(TRANSCRIPT)
 
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
-            translate_subtitles_universal2.requests, "post", fake_post
-        ), mock.patch.object(translate_subtitles_universal2.requests, "get", fake_get), mock.patch.object(
+            translate_subtitles_builtin.requests, "post", fake_post
+        ), mock.patch.object(translate_subtitles_builtin.requests, "get", fake_get), mock.patch.object(
             sys, "argv", ["x", "https://example.com/video.mp4", "--languages", "es", "--out", tmp]
         ):
-            translate_subtitles_universal2.main()
+            translate_subtitles_builtin.main()
             files = sorted(p.name for p in Path(tmp).iterdir())
             es = (Path(tmp) / "video.es.srt").read_text()
 
         translation = posted["json"]["speech_understanding"]["request"]["translation"]
         self.assertTrue(translation["match_original_utterance"])
         self.assertTrue(posted["json"]["speaker_labels"])
-        self.assertEqual(posted["json"]["speech_models"], ["universal-2"])
+        self.assertEqual(posted["json"]["speech_models"], ["assemblyai-stt-3-7"])
         self.assertEqual(files, ["video.en.srt", "video.en.vtt", "video.es.srt", "video.es.vtt"])
         self.assertIn("Buenos días.", es)
 
